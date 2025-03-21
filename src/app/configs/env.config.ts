@@ -6,4 +6,7 @@ export class EnvConfig {
     email: process.env.REACT_APP_DF_EMAIL || '',
     password: process.env.REACT_APP_DF_PASSWORD || ''
   }
+  static key = {
+    RECAPTCHA_SITE_KEY: process.env.REACT_APP_RECAPTCHA_SITE_KEY || ''
+  }
 }

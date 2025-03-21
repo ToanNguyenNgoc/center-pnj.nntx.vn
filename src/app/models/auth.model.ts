@@ -7,7 +7,7 @@ const AuthModel = types.model('AuthModel', {
   profileJson: types.maybeNull(types.string),
 })
   .actions(self => {
-    const login = flow(function* login(body: { email: string, password: string }) {
+    const login = flow(function* login(body: { email: string, password: string, recaptcha:string }) {
       try {
         const response: IResponse<IUserLogin> = yield AxiosConfig().post('/auth/login', body);
         aesEncodeAuthSaveLocal(response.context.token, response.context.refresh_token, response.context.token_expired_at);

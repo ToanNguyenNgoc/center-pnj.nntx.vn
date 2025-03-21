@@ -8,10 +8,12 @@ import dayjs from "dayjs";
 interface Options {
   token?: string
 }
+// export const baseURL = EnvConfig.API_URL;
+export const baseURL = EnvConfig.API_URL_DEV;
 
 export const AxiosConfig = (options?: Options) => {
   const instance = axios.create({
-    baseURL: EnvConfig.API_URL,
+    baseURL,
     timeout: 10000,
     headers: {
       Accept: 'application/json, text/plain, */*',
@@ -57,8 +59,6 @@ const authHandler = async () => {
       token = response.data.context.token;
       aesEncodeAuthSaveLocal(response.data.context.token, refresh_token, response.data.context.token_expired_at);
     }
-  } catch (error) {
-    console.log(error)
-  }
+  } catch (error) {}
   return token
 }
