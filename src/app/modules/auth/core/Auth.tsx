@@ -9,16 +9,17 @@ import {
   SetStateAction,
 } from 'react'
 import {LayoutSplashScreen} from '../../../../_metronic/layout/core'
-import {AuthModel, UserModel} from './_models'
+import {AuthModel} from './_models'
 import * as authHelper from './AuthHelpers'
-import {getUserByToken} from './_requests'
 import {WithChildren} from '../../../../_metronic/helpers'
+import { IUserProfile } from '../../../interfaces'
+import { useStores } from '../../../models/store'
 
 type AuthContextProps = {
   auth: AuthModel | undefined
   saveAuth: (auth: AuthModel | undefined) => void
-  currentUser: UserModel | undefined
-  setCurrentUser: Dispatch<SetStateAction<UserModel | undefined>>
+  currentUser: IUserProfile | undefined
+  setCurrentUser: Dispatch<SetStateAction<IUserProfile | undefined>>
   logout: () => void
 }
 
@@ -38,7 +39,7 @@ const useAuth = () => {
 
 const AuthProvider: FC<WithChildren> = ({children}) => {
   const [auth, setAuth] = useState<AuthModel | undefined>(authHelper.getAuth())
-  const [currentUser, setCurrentUser] = useState<UserModel | undefined>()
+  const [currentUser, setCurrentUser] = useState<IUserProfile | undefined>()
   const saveAuth = (auth: AuthModel | undefined) => {
     setAuth(auth)
     if (auth) {
@@ -62,14 +63,15 @@ const AuthProvider: FC<WithChildren> = ({children}) => {
 
 const AuthInit: FC<WithChildren> = ({children}) => {
   const {auth, logout, setCurrentUser} = useAuth()
+  const {authModel} = useStores()
   const didRequest = useRef(false)
   const [showSplashScreen, setShowSplashScreen] = useState(true)
   // We should request user by authToken (IN OUR EXAMPLE IT'S API_TOKEN) before rendering the application
   useEffect(() => {
-    const requestUser = async (apiToken: string) => {
+    const requestUser = async () => {
       try {
         if (!didRequest.current) {
-          const {data} = await getUserByToken(apiToken)
+          const data = await authModel.profile()
           if (data) {
             setCurrentUser(data)
           }
@@ -86,8 +88,8 @@ const AuthInit: FC<WithChildren> = ({children}) => {
       return () => (didRequest.current = true)
     }
 
-    if (auth && auth.api_token) {
-      requestUser(auth.api_token)
+    if (auth && auth.id) {
+      requestUser()
     } else {
       logout()
       setShowSplashScreen(false)

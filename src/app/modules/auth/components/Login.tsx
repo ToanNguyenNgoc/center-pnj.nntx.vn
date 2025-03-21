@@ -1,12 +1,12 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import {useState} from 'react'
+import { useState } from 'react'
 import * as Yup from 'yup'
 import clsx from 'clsx'
-import {Link} from 'react-router-dom'
-import {useFormik} from 'formik'
-import {getUserByToken, login} from '../core/_requests'
-import {toAbsoluteUrl} from '../../../../_metronic/helpers'
-import {useAuth} from '../core/Auth'
+import { Link } from 'react-router-dom'
+import { useFormik } from 'formik'
+import { useAuth } from '../core/Auth'
+import { observer } from 'mobx-react-lite'
+import { useStores } from '../../../models/store'
 
 const loginSchema = Yup.object().shape({
   email: Yup.string()
@@ -21,8 +21,8 @@ const loginSchema = Yup.object().shape({
 })
 
 const initialValues = {
-  email: 'admin@demo.com',
-  password: 'demo',
+  email: 'super_admin@gmail.com',
+  password: '06011998',
 }
 
 /*
@@ -31,20 +31,23 @@ const initialValues = {
   https://medium.com/@maurice.de.beijer/yup-validation-and-typescript-and-formik-6c342578a20e
 */
 
-export function Login() {
+export const Login = observer(() => {
+  const { authModel } = useStores()
   const [loading, setLoading] = useState(false)
-  const {saveAuth, setCurrentUser} = useAuth()
+  const { saveAuth, setCurrentUser } = useAuth()
 
   const formik = useFormik({
     initialValues,
     validationSchema: loginSchema,
-    onSubmit: async (values, {setStatus, setSubmitting}) => {
+    onSubmit: async (values, { setStatus, setSubmitting }) => {
       setLoading(true)
       try {
-        const {data: auth} = await login(values.email, values.password)
-        saveAuth(auth)
-        const {data: user} = await getUserByToken(auth.api_token)
-        setCurrentUser(user)
+        const auth = await authModel.login({ email: values.email, password: values.password });
+        saveAuth({id:auth.id})
+        const profile = await authModel.profile(auth.token);
+        setCurrentUser(profile);
+        setSubmitting(false)
+        setLoading(false)
       } catch (error) {
         console.error(error)
         saveAuth(undefined)
@@ -64,13 +67,7 @@ export function Login() {
     >
       {/* begin::Heading */}
       <div className='text-center mb-10'>
-        <h1 className='text-dark mb-3'>Sign In to Metronic</h1>
-        <div className='text-gray-400 fw-bold fs-4'>
-          New Here?{' '}
-          <Link to='/auth/registration' className='link-primary fw-bolder'>
-            Create an Account
-          </Link>
-        </div>
+        <h1 className='text-dark mb-3'>Sign In to Shadow Company</h1>
       </div>
       {/* begin::Heading */}
 
@@ -78,14 +75,8 @@ export function Login() {
         <div className='mb-lg-15 alert alert-danger'>
           <div className='alert-text font-weight-bold'>{formik.status}</div>
         </div>
-      ) : (
-        <div className='mb-10 bg-light-info p-8 rounded'>
-          <div className='text-info'>
-            Use account <strong>admin@demo.com</strong> and password <strong>demo</strong> to
-            continue.
-          </div>
-        </div>
-      )}
+      ) : null
+      }
 
       {/* begin::Form group */}
       <div className='fv-row mb-10'>
@@ -95,7 +86,7 @@ export function Login() {
           {...formik.getFieldProps('email')}
           className={clsx(
             'form-control form-control-lg form-control-solid',
-            {'is-invalid': formik.touched.email && formik.errors.email},
+            { 'is-invalid': formik.touched.email && formik.errors.email },
             {
               'is-valid': formik.touched.email && !formik.errors.email,
             }
@@ -123,7 +114,7 @@ export function Login() {
             <Link
               to='/auth/forgot-password'
               className='link-primary fs-6 fw-bolder'
-              style={{marginLeft: '5px'}}
+              style={{ marginLeft: '5px' }}
             >
               Forgot Password ?
             </Link>
@@ -164,51 +155,22 @@ export function Login() {
         >
           {!loading && <span className='indicator-label'>Continue</span>}
           {loading && (
-            <span className='indicator-progress' style={{display: 'block'}}>
+            <span className='indicator-progress' style={{ display: 'block' }}>
               Please wait...
               <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
             </span>
           )}
         </button>
-
-        {/* begin::Separator */}
-        <div className='text-center text-muted text-uppercase fw-bolder mb-5'>or</div>
-        {/* end::Separator */}
-
-        {/* begin::Google link */}
-        <a href='#' className='btn btn-flex flex-center btn-light btn-lg w-100 mb-5'>
-          <img
-            alt='Logo'
-            src={toAbsoluteUrl('/media/svg/brand-logos/google-icon.svg')}
-            className='h-20px me-3'
-          />
-          Continue with Google
-        </a>
-        {/* end::Google link */}
-
-        {/* begin::Google link */}
-        <a href='#' className='btn btn-flex flex-center btn-light btn-lg w-100 mb-5'>
-          <img
-            alt='Logo'
-            src={toAbsoluteUrl('/media/svg/brand-logos/facebook-4.svg')}
-            className='h-20px me-3'
-          />
-          Continue with Facebook
-        </a>
-        {/* end::Google link */}
-
-        {/* begin::Google link */}
-        <a href='#' className='btn btn-flex flex-center btn-light btn-lg w-100'>
-          <img
-            alt='Logo'
-            src={toAbsoluteUrl('/media/svg/brand-logos/apple-black.svg')}
-            className='h-20px me-3'
-          />
-          Continue with Apple
-        </a>
-        {/* end::Google link */}
       </div>
       {/* end::Action */}
+      <div className="d-flex justify-content-center">
+        <div className='text-gray-400 fw-bold fs-4'>
+          Forgot password ?{' '}
+          <Link to='/auth/registration' className='link-primary fw-bolder'>
+            Here
+          </Link>
+        </div>
+      </div>
     </form>
   )
-}
+})

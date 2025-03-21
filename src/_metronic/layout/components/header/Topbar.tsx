@@ -1,6 +1,6 @@
 import clsx from 'clsx'
-import React, {FC} from 'react'
-import {KTSVG, toAbsoluteUrl} from '../../../helpers'
+import React, { FC } from 'react'
+import { KTSVG, toAbsoluteUrl } from '../../../helpers'
 import {
   HeaderNotificationsMenu,
   HeaderUserMenu,
@@ -8,15 +8,18 @@ import {
   Search,
   ThemeModeSwitcher,
 } from '../../../partials'
-import {useLayout} from '../../core'
+import { useLayout } from '../../core'
+import { observer } from 'mobx-react-lite'
+import { useAuth } from '../../../../app/hooks'
 
 const toolbarButtonMarginClass = 'ms-1 ms-lg-3',
   toolbarButtonHeightClass = 'w-30px h-30px w-md-40px h-md-40px',
   toolbarUserAvatarHeightClass = 'symbol-30px symbol-md-40px',
   toolbarButtonIconSizeClass = 'svg-icon-1'
 
-const Topbar: FC = () => {
-  const {config} = useLayout()
+const Topbar = observer(() => {
+  const { config } = useLayout();
+  const {profile} = useAuth();
 
   return (
     <div className='d-flex align-items-stretch flex-shrink-0'>
@@ -127,7 +130,7 @@ const Topbar: FC = () => {
           data-kt-menu-placement='bottom-end'
           data-kt-menu-flip='bottom'
         >
-          <img src={toAbsoluteUrl('/media/avatars/300-1.jpg')} alt='metronic' />
+          <img src={String(profile?.media?.original_url)} alt='metronic' />
         </div>
         <HeaderUserMenu />
         {/* end::Toggle */}
@@ -147,6 +150,6 @@ const Topbar: FC = () => {
       )}
     </div>
   )
-}
+})
 
-export {Topbar}
+export { Topbar }

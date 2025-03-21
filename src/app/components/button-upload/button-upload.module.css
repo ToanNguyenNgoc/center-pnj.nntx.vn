@@ -1,0 +1,10 @@
+.container{
+  aspect-ratio: 1/1;
+  cursor: pointer;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: var(--box-shadow);
+  border-radius: 6px;
+}

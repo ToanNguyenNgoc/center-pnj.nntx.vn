@@ -1,3 +1,4 @@
+import { Const } from '../../../common'
 import {AuthModel} from './_models'
 
 const AUTH_LOCAL_STORAGE_KEY = 'kt-auth-react-v'
@@ -42,6 +43,7 @@ const removeAuth = () => {
 
   try {
     localStorage.removeItem(AUTH_LOCAL_STORAGE_KEY)
+    localStorage.removeItem(Const.StorageKey.sig)
   } catch (error) {
     console.error('AUTH LOCAL STORAGE REMOVE ERROR', error)
   }
@@ -49,17 +51,7 @@ const removeAuth = () => {
 
 export function setupAxios(axios: any) {
   axios.defaults.headers.Accept = 'application/json'
-  axios.interceptors.request.use(
-    (config: {headers: {Authorization: string}}) => {
-      const auth = getAuth()
-      if (auth && auth.api_token) {
-        config.headers.Authorization = `Bearer ${auth.api_token}`
-      }
-
-      return config
-    },
-    (err: any) => Promise.reject(err)
-  )
+  axios.interceptors.request.use()
 }
 
 export {getAuth, setAuth, removeAuth, AUTH_LOCAL_STORAGE_KEY}

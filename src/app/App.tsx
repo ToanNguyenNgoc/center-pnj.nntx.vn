@@ -4,6 +4,7 @@ import {I18nProvider} from '../_metronic/i18n/i18nProvider'
 import {LayoutProvider, LayoutSplashScreen} from '../_metronic/layout/core'
 import {MasterInit} from '../_metronic/layout/MasterInit'
 import {AuthInit} from './modules/auth'
+import { ToastContainer, Zoom } from 'react-toastify'
 
 const App = () => {
   return (
@@ -13,6 +14,13 @@ const App = () => {
           <AuthInit>
             <Outlet />
             <MasterInit />
+            <ToastContainer
+              position='top-right'
+              autoClose={2500}
+              theme="colored"
+              transition={Zoom}
+              hideProgressBar={true}
+            />
           </AuthInit>
         </LayoutProvider>
       </I18nProvider>
