@@ -7,6 +7,8 @@ import { useFormik } from 'formik'
 import { useAuth } from '../core/Auth'
 import { observer } from 'mobx-react-lite'
 import { useStores } from '../../../models/store'
+import { isDev } from '../../../utils'
+import { EnvConfig } from '../../../configs'
 
 const loginSchema = Yup.object().shape({
   email: Yup.string()
@@ -21,8 +23,8 @@ const loginSchema = Yup.object().shape({
 })
 
 const initialValues = {
-  email: 'super_admin@gmail.com',
-  password: '06011998',
+  email: isDev() ? EnvConfig.df.email : '',
+  password: isDev() ? EnvConfig.df.password : '',
 }
 
 /*
@@ -43,7 +45,7 @@ export const Login = observer(() => {
       setLoading(true)
       try {
         const auth = await authModel.login({ email: values.email, password: values.password });
-        saveAuth({id:auth.id})
+        saveAuth({ id: auth.id })
         const profile = await authModel.profile(auth.token);
         setCurrentUser(profile);
         setSubmitting(false)

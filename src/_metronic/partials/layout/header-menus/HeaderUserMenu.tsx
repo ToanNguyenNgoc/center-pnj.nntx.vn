@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { useAuth } from '../../../../app/hooks'
 
 const HeaderUserMenu = observer(() => {
-  const {profile} = useAuth();
+  const { profile, logout } = useAuth();
   return (
     <div
       className='menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg menu-state-primary fw-bold py-4 fs-6 w-275px'
@@ -35,7 +35,7 @@ const HeaderUserMenu = observer(() => {
       </div>
 
       <div className='menu-item px-5'>
-        <a className='menu-link px-5'>
+        <a className='menu-link px-5' onClick={logout}>
           Sign Out
         </a>
       </div>

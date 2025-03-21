@@ -2,8 +2,12 @@ import { useMutation } from "react-query";
 import { IResponse, IRole, IUserProfile, ReqChangePassword, ReqPutProfile } from "../interfaces"
 import { useStores } from "../models/store"
 import { toast } from "react-toastify";
+import { Const } from "../common";
+import { AUTH_LOCAL_STORAGE_KEY } from "../modules/auth";
+import { useNavigate } from "react-router-dom";
 
 export function useAuth() {
+  const navigate = useNavigate()
   const { authModel } = useStores()
   let profile: IUserProfile | null = null;
   let roles: IRole[] = [];
@@ -22,16 +26,23 @@ export function useAuth() {
     onSuccess(data, variables, context) {
       toast.success('Change password success');
     },
-    onError(error:any, variables, context) {
+    onError(error: any, variables, context) {
       toast.error(error.data.message || 'Change password failed')
     },
   })
+  const logout = () => {
+    localStorage.removeItem(Const.StorageKey.sig);
+    localStorage.removeItem(AUTH_LOCAL_STORAGE_KEY);
+    authModel.logout();
+    window.location.reload()
+  }
   return {
     profile,
     roles,
     setProfile: authModel.setProfile,
     putProfile: authModel.putProfile,
     mutationPutProfile,
-    mutationPostChangePassword
+    mutationPostChangePassword,
+    logout
   }
 }

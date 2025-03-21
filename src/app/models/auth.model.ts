@@ -46,12 +46,16 @@ const AuthModel = types.model('AuthModel', {
 
       }
     })
+    const logout = ()=>{
+      self.profileJson = null
+    }
     return {
       login,
       profile,
       setProfile,
       putProfile,
-      postChangePassword
+      postChangePassword,
+      logout,
     }
   });
 
