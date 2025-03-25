@@ -1,13 +1,11 @@
 import { useMutation } from "react-query";
-import { IResponse, IRole, IUserProfile, ReqChangePassword, ReqPutProfile } from "../interfaces"
+import { IResponse, IRole, IUserProfile, ReqChangePassword, ReqForgotPassword, ReqPutProfile } from "../interfaces"
 import { useStores } from "../models/store"
 import { toast } from "react-toastify";
 import { Const } from "../common";
 import { AUTH_LOCAL_STORAGE_KEY } from "../modules/auth";
-import { useNavigate } from "react-router-dom";
 
 export function useAuth() {
-  const navigate = useNavigate()
   const { authModel } = useStores()
   let profile: IUserProfile | null = null;
   let roles: IRole[] = [];
@@ -30,6 +28,15 @@ export function useAuth() {
       toast.error(error.data.message || 'Change password failed')
     },
   })
+  const mutationPostForgotPassword = useMutation<IResponse<any>, unknown, ReqForgotPassword>({
+    mutationFn: (body) => authModel.postForgotPassword(body),
+    onSuccess(data, variables, context) {
+      toast.success(variables.password ? 'Change password success' : 'Send mail success')
+    },
+    onError(error, variables, context) {
+      toast.error(variables.otp ? 'Change password failed' : 'An error when send OTP to mail')
+    },
+  })
   const logout = () => {
     localStorage.removeItem(Const.StorageKey.sig);
     localStorage.removeItem(AUTH_LOCAL_STORAGE_KEY);
@@ -43,6 +50,7 @@ export function useAuth() {
     putProfile: authModel.putProfile,
     mutationPutProfile,
     mutationPostChangePassword,
+    mutationPostForgotPassword,
     logout
   }
 }

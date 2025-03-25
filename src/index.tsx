@@ -28,7 +28,14 @@ import { rootStore, RootStoreContext } from './app/models/store'
  */
 Chart.register(...registerables)
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      staleTime: 0
+    }
+  }
+})
 const container = document.getElementById('root')
 if (container) {
   createRoot(container).render(

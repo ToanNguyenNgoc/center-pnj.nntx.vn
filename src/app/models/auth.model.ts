@@ -1,13 +1,13 @@
 import { flow, types } from "mobx-state-tree";
 import { AxiosConfig } from "../configs";
-import { IResponse, IUserLogin, IUserProfile, ReqChangePassword, ReqPutProfile } from "../interfaces";
+import { IResponse, IRole, IUserLogin, IUserProfile, ReqChangePassword, ReqForgotPassword, ReqPutProfile } from "../interfaces";
 import { aesEncodeAuthSaveLocal } from "../utils";
 
 const AuthModel = types.model('AuthModel', {
   profileJson: types.maybeNull(types.string),
 })
   .actions(self => {
-    const login = flow(function* login(body: { email: string, password: string, recaptcha:string }) {
+    const login = flow(function* login(body: { email: string, password: string, recaptcha: string }) {
       try {
         const response: IResponse<IUserLogin> = yield AxiosConfig().post('/auth/login', body);
         aesEncodeAuthSaveLocal(response.context.token, response.context.refresh_token, response.context.token_expired_at);
@@ -46,7 +46,24 @@ const AuthModel = types.model('AuthModel', {
 
       }
     })
-    const logout = ()=>{
+    const postForgotPassword = flow(function* postChangePassword(req: ReqForgotPassword) {
+      try {
+        const response: IResponse<any> = yield AxiosConfig().post('/auth/forgot-password', req);
+        return response.context;
+      } catch (error) {
+        throw error
+      }
+    })
+    const getRoles = flow(function* getRoles(){
+      try {
+        const response:IResponse<IRole[]> = yield AxiosConfig().get('/auth/roles');
+        return response.context
+      } catch (error) {
+        throw error
+      }
+    })
+
+    const logout = () => {
       self.profileJson = null
     }
     return {
@@ -55,6 +72,8 @@ const AuthModel = types.model('AuthModel', {
       setProfile,
       putProfile,
       postChangePassword,
+      postForgotPassword,
+      getRoles,
       logout,
     }
   });

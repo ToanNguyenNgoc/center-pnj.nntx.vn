@@ -2,7 +2,7 @@ import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import { observer } from 'mobx-react-lite'
 import { useAuth, usePostMedia } from '../../../../../hooks'
-import { Avatar, ButtonUpload } from '../../../../../components'
+import { Avatar, ButtonLoading, ButtonUpload } from '../../../../../components'
 import { ReqPutProfile } from '../../../../../interfaces'
 
 const profileDetailsSchema = Yup.object().shape({
@@ -137,15 +137,11 @@ const ProfileDetails = observer(() => {
           </div>
 
           <div className='card-footer d-flex justify-content-end py-6 px-9'>
-            <button type='submit' className='btn btn-primary' disabled={mutationPutProfile.isLoading}>
-              {!mutationPutProfile.isLoading && 'Save Changes'}
-              {mutationPutProfile.isLoading && (
-                <span className='indicator-progress' style={{ display: 'block' }}>
-                  Please wait...{' '}
-                  <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
-                </span>
-              )}
-            </button>
+            <ButtonLoading
+              title='Save changes'
+              type='submit'
+              loading={mutationPutProfile.isLoading}
+            />
           </div>
         </form>
       </div>

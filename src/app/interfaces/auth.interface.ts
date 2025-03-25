@@ -35,3 +35,10 @@ export interface ReqChangePassword {
   password: string,
   new_password: string
 }
+
+export interface ReqForgotPassword {
+  email: string,
+  otp?: string,
+  password?: string,
+  recaptcha: string
+}

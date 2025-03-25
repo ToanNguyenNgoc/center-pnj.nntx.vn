@@ -9,7 +9,7 @@ interface AvatarProps extends React.DetailedHTMLProps<React.ImgHTMLAttributes<HT
 }
 
 export const Avatar: FC<AvatarProps> = (props) => {
-  const { imageUrl, type = 'square', size, ...rest } = props;
+  const { imageUrl='', type = 'square', size, ...rest } = props;
   return (
     <img
       src={imageUrl}

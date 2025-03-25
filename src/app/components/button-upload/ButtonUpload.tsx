@@ -11,13 +11,13 @@ interface ButtonUploadProps extends React.DetailedHTMLProps<React.LabelHTMLAttri
 export const ButtonUpload: FC<ButtonUploadProps> = (props) => {
   const { id = 'media', size = 36, onChangeFile = () => null, ...rest } = props
   return (
-    <div>
+    <div style={{ width: 'fit-content' }}>
       <input type="file" id={id} hidden onChange={e => {
         if (e.target.files) {
           onChangeFile(e.target.files)
         }
       }} />
-      <label htmlFor={id} className={style.container} style={{ width: size }} {...rest}>
+      <label htmlFor={id} style={{ width: size }} {...rest} className={`${style.container} ${props.className}`} >
         <img
           style={{ width: '75%', aspectRatio: '1/1', objectFit: 'cover' }}
           src={toAbsoluteUrl('/media/svg/files/camera.svg')} alt=""

@@ -179,14 +179,6 @@ export const Login = observer(() => {
           </button>
         </div>
         {/* end::Action */}
-        <div className="d-flex justify-content-center">
-          <div className='text-gray-400 fw-bold fs-4'>
-            Forgot password ?{' '}
-            <Link to='/auth/registration' className='link-primary fw-bolder'>
-              Here
-            </Link>
-          </div>
-        </div>
         <GoogleReCaptcha refreshReCaptcha={refreshReCaptcha} onVerify={verifyRecaptchaCallback} />
       </form>
     </GoogleReCaptchaProvider>

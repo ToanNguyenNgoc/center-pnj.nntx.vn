@@ -1,9 +1,10 @@
 /* eslint-disable react/jsx-no-target-blank */
 import React from 'react'
-import {useIntl} from 'react-intl'
-import {KTSVG} from '../../../helpers'
-import {AsideMenuItemWithSub} from './AsideMenuItemWithSub'
-import {AsideMenuItem} from './AsideMenuItem'
+import { useIntl } from 'react-intl'
+import { KTSVG } from '../../../helpers'
+import { AsideMenuItemWithSub } from './AsideMenuItemWithSub'
+import { AsideMenuItem } from './AsideMenuItem'
+import { PermissionLayout } from '../../../../app/components'
 
 export function AsideMenuMain() {
   const intl = useIntl()
@@ -13,7 +14,7 @@ export function AsideMenuMain() {
       <AsideMenuItem
         to='/dashboard'
         icon='/media/icons/duotune/art/art002.svg'
-        title={intl.formatMessage({id: 'MENU.DASHBOARD'})}
+        title={intl.formatMessage({ id: 'MENU.DASHBOARD' })}
         fontIcon='bi-app-indicator'
       />
       <AsideMenuItem
@@ -106,6 +107,22 @@ export function AsideMenuMain() {
         title='User management'
         fontIcon='bi-layers'
       />
+      <PermissionLayout permissions={['.roles.get']}>
+        <AsideMenuItem
+          to='/apps/roles'
+          icon='/media/icons/duotune/general/gen051.svg'
+          title='Nhóm người dùng và phân quyền'
+          fontIcon='bi-layers'
+        />
+      </PermissionLayout>
+      <PermissionLayout permissions={['users.get']}>
+        <AsideMenuItem
+          to='/apps/users'
+          icon='/media/icons/duotune/general/gen051.svg'
+          title='Người dùng'
+          fontIcon='bi-layers'
+        />
+      </PermissionLayout>
       <div className='menu-item'>
         <div className='menu-content'>
           <div className='separator mx-1 my-4'></div>

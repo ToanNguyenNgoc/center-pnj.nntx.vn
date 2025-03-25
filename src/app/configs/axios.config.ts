@@ -19,11 +19,8 @@ export const AxiosConfig = (options?: Options) => {
       Accept: 'application/json, text/plain, */*',
       'Content-Type': 'application/json',
     },
-    paramsSerializer: {
-      //@ts-ignore
-      serialize: (params: Record<string, any>) => queryString.stringify(params),
-      indexes: false,
-    },
+    paramsSerializer: (params) => queryString.stringify(params),
+
   });
 
   instance.interceptors.request.use(async (config) => {
