@@ -9,8 +9,12 @@ export class Const {
     staleTime: 3600 * 10 * 10,
     roles_auth: 'roles_auth',
     roles: 'roles',
-    permissions:'permissions',
-    users:'users'
+    permissions: 'permissions',
+    users: 'users',
+    provinces: 'provinces',
+    districts: 'districts',
+    wards: 'wards',
+    organizations: 'organizations'
   }
   static Role = {
     SUPER_ADMIN: 'SUPER_ADMIN'

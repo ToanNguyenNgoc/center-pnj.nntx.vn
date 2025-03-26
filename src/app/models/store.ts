@@ -4,12 +4,14 @@ import AuthModel from "./auth.model";
 import MediaModel from "./media.model";
 import RoleModel from "./role.model";
 import UserModel from "./user.model";
+import OrganizationModel from "./organization.model";
 
 const RootStoreModel = types.model('RootStoreModel', {
   authModel: types.optional(AuthModel, {} as any),
   mediaModel: types.optional(MediaModel, {} as any),
   roleModel: types.optional(RoleModel, {} as any),
   userModel: types.optional(UserModel, {} as any),
+  organizationModel: types.optional(OrganizationModel, {} as any),
 });
 
 export const rootStore = RootStoreModel.create({});

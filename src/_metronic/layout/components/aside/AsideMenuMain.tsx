@@ -23,12 +23,12 @@ export function AsideMenuMain() {
         title='Layout Builder'
         fontIcon='bi-layers'
       />
-      <div className='menu-item'>
+      {/* <div className='menu-item'>
         <div className='menu-content pt-8 pb-2'>
           <span className='menu-section text-muted text-uppercase fs-8 ls-1'>Crafted</span>
         </div>
-      </div>
-      <AsideMenuItemWithSub
+      </div> */}
+      {/* <AsideMenuItemWithSub
         to='/crafted/pages'
         title='Pages'
         fontIcon='bi-archive'
@@ -85,12 +85,24 @@ export function AsideMenuMain() {
         <AsideMenuItem to='/crafted/widgets/mixed' title='Mixed' hasBullet={true} />
         <AsideMenuItem to='/crafted/widgets/tables' title='Tables' hasBullet={true} />
         <AsideMenuItem to='/crafted/widgets/feeds' title='Feeds' hasBullet={true} />
-      </AsideMenuItemWithSub>
+      </AsideMenuItemWithSub> */}
       <div className='menu-item'>
         <div className='menu-content pt-8 pb-2'>
           <span className='menu-section text-muted text-uppercase fs-8 ls-1'>Apps</span>
         </div>
       </div>
+      <AsideMenuItem
+        to='/apps/organizations'
+        icon='/media/icons/duotune/general/gen001.svg'
+        title='Thông tin công ty'
+        fontIcon='bi-layers'
+      />
+      <AsideMenuItem
+        to='/apps/brands'
+        icon='/media/icons/duotune/general/gen001.svg'
+        title='Thương hiệu'
+        fontIcon='bi-layers'
+      />
       <AsideMenuItemWithSub
         to='/apps/chat'
         title='Chat'
@@ -115,7 +127,7 @@ export function AsideMenuMain() {
           fontIcon='bi-layers'
         />
       </PermissionLayout>
-      <PermissionLayout permissions={['users.get']}>
+      <PermissionLayout permissions={['.users.get']}>
         <AsideMenuItem
           to='/apps/users'
           icon='/media/icons/duotune/general/gen051.svg'

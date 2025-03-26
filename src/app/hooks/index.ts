@@ -5,3 +5,5 @@ export * from './useGetRolesAndPermissions';
 export * from './useGenPermissionGroup';
 export * from './useQueryParams';
 export * from './useDebounce';
+export * from './useGetProvince';
+export * from './useGetOrgContactTypes';

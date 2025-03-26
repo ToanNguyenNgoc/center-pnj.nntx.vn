@@ -15,4 +15,7 @@ export class Toast {
   static error(message = 'Có lỗi xảy ra. Vui lòng thử lại !') {
     return toast.error(message)
   }
+  static warning(message = 'Cảnh báo') {
+    return toast.warning(message)
+  }
 }

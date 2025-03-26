@@ -19,7 +19,10 @@ const PrivateRoutes = () => {
   const RolesFormPage = lazy(() => import('../pages/roles/RolesFormPage'));
   const CustomersPage = lazy(() => import('../pages/users/UsersPage'));
   const CustomersFormPage = lazy(() => import('../pages/users/UsersFormPage'));
-  ;
+  const OrganizationsPage = lazy(() => import('../pages/organizations/OrganizationsPage'));
+  const OrganizationsFormPage = lazy(() => import('../pages/organizations/OrganizationsFormPage'));
+  const BrandsPage = lazy(() => import('../pages/brands/BrandsPage'));
+
   return (
     <Routes>
       <Route element={<MasterLayout />}>
@@ -30,6 +33,40 @@ const PrivateRoutes = () => {
         <Route path='builder' element={<BuilderPageWrapper />} />
         <Route path='menu-test' element={<MenuTestPage />} />
         {/* Lazy Modules */}
+        <Route
+          path='apps/organizations'
+          element={
+            <SuspensedView>
+              <OrganizationsPage />
+            </SuspensedView>
+          }
+        />
+        <Route
+          path='apps/organizations-form/:id'
+          element={
+            <SuspensedView>
+              <OrganizationsFormPage />
+            </SuspensedView>
+          }
+        />
+        <Route
+          path='apps/organizations-form'
+          element={
+            <SuspensedView>
+              <OrganizationsFormPage />
+            </SuspensedView>
+          }
+        />
+        {/* brand */}
+        <Route
+          path='apps/brands'
+          element={
+            <SuspensedView>
+              <BrandsPage />
+            </SuspensedView>
+          }
+        />
+        {/* profile */}
         <Route
           path='crafted/pages/profile/*'
           element={

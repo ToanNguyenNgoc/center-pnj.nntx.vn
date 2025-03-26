@@ -4,3 +4,5 @@ export * from './media.interface';
 export * from './role.interface';
 export * from './query.interface';
 export * from './user.interface';
+export * from './organization.interface';
+export * from './province.interface';
