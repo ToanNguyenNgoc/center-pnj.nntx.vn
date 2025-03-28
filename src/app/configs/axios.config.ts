@@ -46,13 +46,13 @@ export const AxiosConfig = (options?: Options) => {
   return instance;
 };
 
-const authHandler = async () => {
+export const authHandler = async () => {
   let token;
   try {
     const { token: tokenLocal, refresh_token, token_expired_at } = JSON.parse(aesDecode(localStorage.getItem(Const.StorageKey.sig) || ''));
     token = tokenLocal;
     if (dayjs().isAfter(dayjs(token_expired_at))) {
-      const response = await axios.post(`${EnvConfig.API_URL}/auth/refresh`, { refresh: refresh_token });
+      const response = await axios.post(`${baseURL}/auth/refresh`, { refresh: refresh_token });
       token = response.data.context.token;
       aesEncodeAuthSaveLocal(response.data.context.token, refresh_token, response.data.context.token_expired_at);
     }

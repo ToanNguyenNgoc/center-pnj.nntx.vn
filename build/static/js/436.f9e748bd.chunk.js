@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkadmin_pnj_nntx_vn=self.webpackChunkadmin_pnj_nntx_vn||[]).push([[436],{6436:function(n,s,e){e.r(s);var r=e(7257),a=e(4906),i=e(3504),t=e(184),c=(0,r.Pi)((function(){return(0,t.jsxs)("div",{className:"card p-3",children:[(0,t.jsx)(a.LL,{title:"Th\u01b0\u01a1ng hi\u1ec7u",element:(0,t.jsx)(a.yt,{permissions:[".brands.post"],children:(0,t.jsx)(i.rU,{to:"/brands-form",className:"btn btn-primary",children:"T\u1ea1o m\u1edbi"})})}),"BrandsPage"]})}));s.default=c}}]);
-//# sourceMappingURL=436.f9e748bd.chunk.js.map

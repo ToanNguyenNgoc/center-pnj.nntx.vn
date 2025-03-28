@@ -19,4 +19,9 @@ export class Const {
   static Role = {
     SUPER_ADMIN: 'SUPER_ADMIN'
   }
+  static EventName = {
+    join: 'join',
+    join_all:'join_all',
+    message:'message'
+  }
 }

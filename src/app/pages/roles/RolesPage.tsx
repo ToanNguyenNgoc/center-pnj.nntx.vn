@@ -3,11 +3,27 @@ import { ButtonLoading, PermissionLayout, TitlePage } from "../../components";
 import { useQuery } from "react-query";
 import { Const } from "../../common";
 import { useStores } from "../../models/store";
-import { useGetRolesAndPermissions } from "../../hooks";
+import { useGetRolesAndPermissions, useSocketService } from "../../hooks";
 import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export function useGetDataRoles() {
   const { hasEnabled } = useGetRolesAndPermissions()
+  const { connect, disconnect, onEmitMessage } = useSocketService()
+  // useEffect(() => {
+  //   connect()
+  //     .then(() => {
+  //       onEmitMessage((data: any) => {
+  //         console.log(data)
+  //       })
+  //     })
+  //     .catch(() => { });
+  //   return () => {
+  //     disconnect()
+  //   }
+  // })
+
+
   const { roleModel } = useStores()
   const { data } = useQuery({
     queryKey: [Const.QueryKey.roles],
@@ -22,7 +38,7 @@ export function useGetDataRoles() {
 
 const RolesPage = observer(() => {
   const navigate = useNavigate()
-  const {data} = useGetDataRoles()
+  const { data } = useGetDataRoles()
 
   return (
     <PermissionLayout permissions={['.roles.get']} showEmpty>
