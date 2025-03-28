@@ -2,20 +2,38 @@ import { observer } from "mobx-react-lite";
 import { ButtonLoading, Input, PermissionLayout, TitlePage } from "../../components";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useSocketService } from "../../hooks";
-import { IResponse } from "../../interfaces";
+import { useAuth, useSocketService } from "../../hooks";
+import { IResponse, IUserProfile } from "../../interfaces";
 
+const topic_id = 1;
 
 const BrandsPage = observer(() => {
-  const { connect, onEmitMessage, doMessage } = useSocketService()
+  const { profile } = useAuth()
+  const {
+    connect,
+    onListenerTopicCreated, onListenerMessage, onListenerTyping,
+    doCreateTopic, doMessage, doTyping,
+  } = useSocketService()
   const [messages, setMessage] = useState<any[]>([])
+  const [userTyping, setUserTyping] = useState<IUserProfile>()
   useEffect(() => {
     const setupSocket = async () => {
       await connect();
-      onEmitMessage((data: IResponse<any>) => {
+      onListenerTopicCreated((data: any) => {
+        console.log(data)
+      })
+      onListenerMessage((data: IResponse<any>) => {
         console.log(data.context);
         setMessage((prev: any) => [...prev, data.context])
       });
+      onListenerTyping((data: IResponse<any>) => {
+        console.log(data.context);
+        if (data.context.is_typing) {
+          setUserTyping(data.context.user);
+        } else {
+          setUserTyping(undefined);
+        }
+      })
     };
     setupSocket();
     return () => {
@@ -25,7 +43,7 @@ const BrandsPage = observer(() => {
   const [text, setText] = useState('')
   const onSendMessage = () => {
     doMessage({
-      topic_id: 1,
+      topic_id,
       msg: text
     });
     setText('')
@@ -37,18 +55,6 @@ const BrandsPage = observer(() => {
           <Link to={'/brands-form'} className="btn btn-primary">Tạo mới</Link>
         </PermissionLayout>
       } />
-      <div className="d-flex mt-6">
-        <Input
-          value={text}
-          onChange={e => setText(e.target.value)}
-          placeholder="Aa..."
-        />
-        <ButtonLoading
-          title="Send"
-          type="button"
-          onClick={onSendMessage}
-        />
-      </div>
       <ul>
         {
           messages.map((message: any, index) => (
@@ -60,7 +66,35 @@ const BrandsPage = observer(() => {
             </li>
           ))
         }
+        {
+          (userTyping && userTyping.id !== profile?.id) &&
+          <li><span className="fw-bold">{userTyping.fullname} typing...</span></li>
+        }
       </ul>
+      <div className="d-flex mt-6">
+        <Input
+          value={text}
+          onChange={e => setText(e.target.value)}
+          placeholder="Aa..."
+          onFocus={() => doTyping({ is_typing: true, topic_id })}
+          onBlur={() => doTyping({ is_typing: false, topic_id })}
+        />
+        <ButtonLoading
+          title="Send"
+          type="button"
+          onClick={onSendMessage}
+        />
+      </div>
+      <ButtonLoading
+        title="create topic"
+        type="button"
+        onClick={() => doCreateTopic({
+          recipient_id: 6,
+          media_id: 1,
+          msg: 'OK',
+          group_name: 'group name'
+        })}
+      />
     </div>
   )
 })

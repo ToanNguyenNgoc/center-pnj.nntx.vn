@@ -11,3 +11,4 @@ export * from './table-buffer-zone/TabletBufferZone';
 export * from './react-switch/Switch';
 export * from './confirm-action/ConfirmAction';
 export * from './select-option-province/SelectOptionProvince';
+export * from './instance-socket/InstanceSocket';

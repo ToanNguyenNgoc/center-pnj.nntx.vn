@@ -8,8 +8,8 @@ import dayjs from "dayjs";
 interface Options {
   token?: string
 }
-export const baseURL = EnvConfig.API_URL;
-// export const baseURL = EnvConfig.API_URL_DEV;
+// export const baseURL = EnvConfig.API_URL;
+export const baseURL = EnvConfig.API_URL_DEV;
 
 export const AxiosConfig = (options?: Options) => {
   const instance = axios.create({
