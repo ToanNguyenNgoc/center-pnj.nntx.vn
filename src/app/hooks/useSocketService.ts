@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
 import { authHandler, baseURL } from "../configs";
 import { Const, WS_EVENT_NAME } from "../common";
+import { IMessage, IResponse, ITopic } from "../interfaces";
 
 export function useSocketService(isInstance=true) {
   const socketRef = useRef<Socket | null>(null);
@@ -25,7 +26,6 @@ export function useSocketService(isInstance=true) {
 
         socketRef.current.on("connect", () => {
           console.log("Connected to WebSocket");
-          doJoinAllTopic();
           resolve(socketRef.current!);
         });
 
@@ -47,7 +47,7 @@ export function useSocketService(isInstance=true) {
     }
   };
 
-  const onListenerTopicCreated = (cb: (data: any) => void) => {
+  const onListenerTopicCreated = (cb: (data: IResponse<{topicResponse:ITopic, messageResponse:IMessage}>) => void) => {
     socketRef.current?.on(WS_EVENT_NAME.receive_topic, cb)
   }
   const onListenerMessage = (cb: (data: any) => void) => {
@@ -57,7 +57,7 @@ export function useSocketService(isInstance=true) {
     socketRef.current?.on(WS_EVENT_NAME.typing, cb)
   }
   //[DO ACTION]
-  const doCreateTopic = (body: { recipient_id: number; group_name: string; msg?: string; media_id?: number; }) => {
+  const doCreateTopic = (body: {topic_id:number, recipient_id: number; group_name: string; msg?: string; media_id?: number; }) => {
     if (!socketRef.current) return;
     socketRef.current.emit(WS_EVENT_NAME.create_topic, body)
   }

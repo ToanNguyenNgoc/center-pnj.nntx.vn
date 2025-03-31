@@ -103,6 +103,12 @@ export function AsideMenuMain() {
         title='Thương hiệu'
         fontIcon='bi-layers'
       />
+      <AsideMenuItem
+        to='/apps/messengers'
+        icon='/media/icons/duotune/communication/com012.svg'
+        title='Tin nhắn'
+        fontIcon='bi-layers'
+      />
       <AsideMenuItemWithSub
         to='/apps/chat'
         title='Chat'

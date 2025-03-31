@@ -5,7 +5,7 @@ import { KTSVG } from "../../../_metronic/helpers";
 import { useStores } from "../../models/store";
 import { useMutation, useQuery } from "react-query";
 import { Const } from "../../common";
-import { formatDate, Toast } from "../../utils";
+import { aesEncode, formatDate, Toast } from "../../utils";
 import { useDebounce, useQueryParams } from "../../hooks";
 import { IUserProfile, QrUser, ReqPostUser } from "../../interfaces";
 import { Link, useNavigate } from "react-router-dom";
@@ -104,7 +104,7 @@ interface UserItemProps {
 }
 
 const UserItem: FC<UserItemProps> = ({ user, onDelete = () => null }) => {
-  const { userModel } = useStores()
+  const { userModel, topicModel } = useStores()
   const [active, setActive] = useState(user.active);
   const { mutate } = useMutation({
     mutationFn: (body: ReqPostUser) => userModel.patchUser(user.id, body),
@@ -119,6 +119,13 @@ const UserItem: FC<UserItemProps> = ({ user, onDelete = () => null }) => {
   const onChangeStatus = (check: boolean) => {
     setActive(check);
     mutate({ active: check })
+  }
+  const navigate = useNavigate();
+  const onNavigateMessenger = async () => {
+    const topic = await topicModel.postTopic({ recipient_id: user.id, group_name: '' })
+    if (topic.id) {
+      navigate(`/apps/messengers?topic_id=${aesEncode(String(topic.id))}`)
+    }
   }
   return (
     <tr key={user.id}>
@@ -177,11 +184,17 @@ const UserItem: FC<UserItemProps> = ({ user, onDelete = () => null }) => {
         <PermissionLayout permissions={['.users.:id.delete']}>
           <button
             onClick={() => onDelete(user.id)}
-            className='btn btn-icon btn-bg-light btn-active-color-primary btn-sm'
+            className='btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1'
           >
             <KTSVG path='/media/icons/duotune/general/gen027.svg' className='svg-icon-3' />
           </button>
         </PermissionLayout>
+        <button
+          onClick={onNavigateMessenger}
+          className='btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1'
+        >
+          <KTSVG path='/media/icons/duotune/communication/com003.svg' className='svg-icon-3' />
+        </button>
       </td>
     </tr>
   )

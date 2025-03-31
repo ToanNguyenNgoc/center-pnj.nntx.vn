@@ -33,6 +33,7 @@
     "react-copy-to-clipboard": "5.1.0",
     "react-dom": "18.0.0",
     "react-google-recaptcha-v3": "^1.10.1",
+    "react-infinite-scroll-component": "^6.1.0",
     "react-inlinesvg": "3.0.0",
     "react-intl": "5.25.0",
     "react-otp-input": "^3.1.1",

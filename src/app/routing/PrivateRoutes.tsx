@@ -23,6 +23,7 @@ const PrivateRoutes = () => {
   const OrganizationsPage = lazy(() => import('../pages/organizations/OrganizationsPage'));
   const OrganizationsFormPage = lazy(() => import('../pages/organizations/OrganizationsFormPage'));
   const BrandsPage = lazy(() => import('../pages/brands/BrandsPage'));
+  const MessengerPage = lazy(()=> import('../pages/messenger/MessengerPage'));
 
   return (
     <Fragment>
@@ -163,6 +164,14 @@ const PrivateRoutes = () => {
             element={
               <SuspensedView>
                 <CustomersFormPage />
+              </SuspensedView>
+            }
+          />
+          <Route
+            path='apps/messengers'
+            element={
+              <SuspensedView>
+                <MessengerPage />
               </SuspensedView>
             }
           />

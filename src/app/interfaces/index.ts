@@ -6,3 +6,5 @@ export * from './query.interface';
 export * from './user.interface';
 export * from './organization.interface';
 export * from './province.interface';
+export * from './topic.interface';
+export * from './message.interface';

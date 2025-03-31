@@ -14,7 +14,9 @@ export class Const {
     provinces: 'provinces',
     districts: 'districts',
     wards: 'wards',
-    organizations: 'organizations'
+    organizations: 'organizations',
+    topics:'topics',
+    messages:'messages'
   }
   static Role = {
     SUPER_ADMIN: 'SUPER_ADMIN'
