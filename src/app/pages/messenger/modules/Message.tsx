@@ -58,7 +58,7 @@ export const Message: FC = observer(() => {
             </div>
           </div>
         </div>
-        <ChatInner topic={dataTopic} profile={profile} />
+        <ChatInner topic={dataTopic} profile={profile} topicId={topicId} />
       </div>
     </div>
   )
@@ -68,9 +68,10 @@ type Props = {
   isDrawer?: boolean;
   topic: ITopic;
   profile: IUserProfile;
+  topicId:number
 }
 
-const ChatInner: FC<Props> = observer(({ isDrawer, topic, profile }) => {
+const ChatInner: FC<Props> = observer(({ isDrawer, topic, profile, topicId }) => {
   const { messageModel } = useStores();
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [userTyping, setUserTyping] = useState<IUserProfile>();
@@ -95,6 +96,7 @@ const ChatInner: FC<Props> = observer(({ isDrawer, topic, profile }) => {
       })
       onListenerMessage((data: IResponse<IMessage>) => {
         if (data.context) {
+          console.log(data.context);
           setMessages(prev => [data.context, ...prev])
           setTimeout(() => scrollBottom({ top: 0, behavior: 'smooth' }), 100)
         }
@@ -108,7 +110,7 @@ const ChatInner: FC<Props> = observer(({ isDrawer, topic, profile }) => {
     }
     onListener()
     return () => setMessages([])
-  }, [])
+  }, [topicId])
   const sendMessage = () => {
     if (listMessage.length === 0) {
       doCreateTopic({
@@ -134,6 +136,17 @@ const ChatInner: FC<Props> = observer(({ isDrawer, topic, profile }) => {
     }
   }
   const scrollableDivRef = useRef<HTMLDivElement | null>(null);
+
+  const [image, setImage] = useState<any>(null);
+  const handlePaste = (event:any) => {
+    const items = event.clipboardData.items;
+    for (let item of items) {
+      if (item.type.startsWith("image")) {
+        const file = item.getAsFile();
+        console.log(file);
+      }
+    }
+  };
 
   return (
     <div
@@ -234,6 +247,7 @@ const ChatInner: FC<Props> = observer(({ isDrawer, topic, profile }) => {
           placeholder='Type a message'
           value={body.msg}
           onChange={(e) => setBody(prev => ({ ...prev, msg: e.target.value }))}
+          onPaste={handlePaste}
           onKeyDown={onEnterPress}
           onFocus={() => doTyping({ is_typing: true, topic_id: topic.id })}
           onBlur={() => doTyping({ is_typing: false, topic_id: topic.id })}

@@ -1,13 +1,13 @@
 import { observer } from "mobx-react-lite";
-import { FC } from "react";
+import { FC, memo } from "react";
 import { KTSVG } from "../../../../_metronic/helpers";
 import { useQuery } from "react-query";
 import { Const } from "../../../common";
 import { useStores } from "../../../models/store";
 import { useAuth, useQueryParams } from "../../../hooks";
 import { ITopic, QrTopic } from "../../../interfaces";
-import { Link } from "react-router-dom";
-import { aesDecode, aesEncode } from "../../../utils";
+import { Link, useNavigate } from "react-router-dom";
+import { aesEncode } from "../../../utils";
 
 export const GetTopicName = (topic: ITopic, profileId: number) => {
   let name = topic.group_name;
@@ -18,13 +18,19 @@ export const GetTopicName = (topic: ITopic, profileId: number) => {
   return name;
 }
 
-export const Topic: FC = observer(() => {
+export const Topic: FC = memo(() => {
   const { profile } = useAuth()
+  const navigate = useNavigate();
   const { topicModel } = useStores();
   const { query } = useQueryParams<QrTopic>()
   const { data } = useQuery({
-    queryKey: [Const.QueryKey.topics, query],
-    queryFn: () => topicModel.getTopics(query)
+    queryKey: [Const.QueryKey.topics],
+    queryFn: () => topicModel.getTopics(query),
+    onSuccess(data) {
+      if (data.data.length > 0) {
+        navigate(`/apps/messengers?topic_id=${aesEncode(String(data.data[0].id))}`)
+      }
+    },
   })
   const topics = data?.data || []
   return (
@@ -58,12 +64,12 @@ export const Topic: FC = observer(() => {
           >
             {
               topics.map(topic => (
-                <Link to={`/apps/messengers?topic_id=${aesEncode(String(topic.id))}`} key={topic.id} className="pe-auto">
+                <div onClick={() => navigate(`/apps/messengers?topic_id=${aesEncode(String(topic.id))}`)} key={topic.id} className="pe-auto">
                   <div className='d-flex flex-stack py-4'>
                     <div className='d-flex align-items-center'>
                       <div className='symbol symbol-45px symbol-circle'>
                         <span className='symbol-label bg-light-danger text-danger fs-6 fw-bolder'>
-                        {GetTopicName(topic, Number(profile?.id)).slice(0,1)}
+                          {GetTopicName(topic, Number(profile?.id)).slice(0, 1)}
                         </span>
                       </div>
                       <div className='ms-5'>
@@ -78,7 +84,7 @@ export const Topic: FC = observer(() => {
                     </div>
                   </div>
                   <div className='separator separator-dashed d-none'></div>
-                </Link>
+                </div>
               ))
             }
           </div>
