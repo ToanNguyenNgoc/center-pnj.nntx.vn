@@ -1,6 +1,7 @@
 import { IUserProfile } from "./auth.interface";
 import { IMedia } from "./media.interface";
 import { QrBase } from "./query.interface";
+import { ITopic } from "./topic.interface";
 
 export interface QrMessage extends QrBase {
   topic_id: number,
@@ -15,5 +16,6 @@ export interface IMessage {
   active?: boolean,
   msg: string,
   user: IUserProfile,
-  media?: IMedia
+  medias: IMedia[],
+  topic?:ITopic
 }

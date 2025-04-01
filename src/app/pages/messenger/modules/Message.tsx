@@ -2,28 +2,32 @@
 import { observer } from "mobx-react-lite";
 import { FC, useEffect, useRef, useState } from "react";
 import clsx from "clsx";
-import { useAuth, useQueryParams, useSocketService } from "../../../hooks";
+import { useAuth, usePostMedia, useSocketService } from "../../../hooks";
 import { aesDecode, formatDate } from "../../../utils";
 import { useQuery } from "react-query";
 import { Const } from "../../../common";
 import { useStores } from "../../../models/store";
 import { isNaN } from "formik";
 import { GetTopicName } from "./Topic";
-import { IMessage, IResponse, ITopic, IUserProfile } from "../../../interfaces";
+import { IMedia, IMessage, IResponse, ITopic, IUserProfile } from "../../../interfaces";
 import { Avatar } from "../../../components";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { toAbsoluteUrl } from "../../../../_metronic/helpers";
+import { useParams } from "react-router-dom";
+import { MessageEmpty } from "./MessageEmpty";
 
 export const Message: FC = observer(() => {
   const { profile } = useAuth();
   const { topicModel } = useStores();
-  const { query } = useQueryParams<{ topic_id: string }>()
-  const topicId = Number(aesDecode(query.topic_id || ''));
+  const params = useParams();
+  const topicId = Number(aesDecode(`${params.id}`));
   const { data: dataTopic } = useQuery({
     queryKey: [Const.QueryKey.topics, topicId],
     queryFn: () => topicModel.getTopic(topicId),
-    enabled: !isNaN(topicId)
+    enabled: !isNaN(topicId) && topicId !== 0,
+    staleTime: Const.QueryKey.staleTime
   })
-  if (!dataTopic || !profile) return null;
+  if (!dataTopic || !profile) return <MessageEmpty />;
   return (
     <div className='flex-lg-row-fluid ms-lg-7 ms-xl-10'>
       <div className='card' id='kt_chat_messenger'>
@@ -68,11 +72,12 @@ type Props = {
   isDrawer?: boolean;
   topic: ITopic;
   profile: IUserProfile;
-  topicId:number
+  topicId: number
 }
 
 const ChatInner: FC<Props> = observer(({ isDrawer, topic, profile, topicId }) => {
   const { messageModel } = useStores();
+  const { handlePostMedia } = usePostMedia();
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [userTyping, setUserTyping] = useState<IUserProfile>();
   const [body, setBody] = useState<{ msg: string, media_id?: number }>({ msg: '', media_id: undefined });
@@ -84,19 +89,12 @@ const ChatInner: FC<Props> = observer(({ isDrawer, topic, profile, topicId }) =>
     if (!scrollableDivRef.current) return;
     scrollableDivRef.current.scrollTo(options);
   }
-  const { connect, doMessage, doTyping, onListenerMessage, onListenerTyping, onListenerTopicCreated, doCreateTopic } = useSocketService();
+  const { connect, doMessage, doTyping, onListenerMessage, onListenerTyping, doCreateTopic } = useSocketService();
   useEffect(() => {
     const onListener = async () => {
       await connect();
-      onListenerTopicCreated(data => {
-        if(data.context){
-          setMessages(prev => [data.context.messageResponse, ...prev])
-          setTimeout(() => scrollBottom({ top: 0, behavior: 'smooth' }), 100)
-        }
-      })
       onListenerMessage((data: IResponse<IMessage>) => {
         if (data.context) {
-          console.log(data.context);
           setMessages(prev => [data.context, ...prev])
           setTimeout(() => scrollBottom({ top: 0, behavior: 'smooth' }), 100)
         }
@@ -109,23 +107,30 @@ const ChatInner: FC<Props> = observer(({ isDrawer, topic, profile, topicId }) =>
       })
     }
     onListener()
-    return () => setMessages([])
+  }, [])
+  useEffect(() => {
+    setMessages([])
   }, [topicId])
-  const sendMessage = () => {
-    if (listMessage.length === 0) {
-      doCreateTopic({
-        recipient_id: topic.users.filter(i => i.id !== profile.id)[0].id,
-        group_name: '',
-        msg: body.msg,
-        topic_id: topic.id
+
+  const sendMessage = async () => {
+    if (body.msg.trim().length === 0 && images.length === 0) return;
+    let media_ids: number[] = [];
+    if (images.length > 0) {
+      const medias = await handlePostMedia({
+        //@ts-ignore
+        files: images.map(i => i.file).filter(Boolean),
+        callBackApi() { },
       })
-    } else {
-      doMessage({
-        msg: body.msg,
-        topic_id: topic.id
-      })
+      //@ts-ignore
+      media_ids = medias?.map(i => i.id).filter(Boolean)
     }
+    doMessage({
+      msg: body.msg,
+      topic_id: topic.id,
+      media_ids
+    })
     setBody({ msg: '', media_id: undefined })
+    setImages([])
   }
   const listMessage = messages.concat(dataMessage?.data || [])
 
@@ -137,16 +142,24 @@ const ChatInner: FC<Props> = observer(({ isDrawer, topic, profile, topicId }) =>
   }
   const scrollableDivRef = useRef<HTMLDivElement | null>(null);
 
-  const [image, setImage] = useState<any>(null);
-  const handlePaste = (event:any) => {
+  //[Handle]: media
+  const [images, setImages] = useState<IMedia[]>([]);
+  const handlePaste = (event: any) => {
     const items = event.clipboardData.items;
     for (let item of items) {
       if (item.type.startsWith("image")) {
         const file = item.getAsFile();
-        console.log(file);
+        handlePostMedia({
+          //@ts-ignore
+          files: [file],
+          callBackLocal(medias) {
+            setImages(prev => [...medias, ...prev])
+          },
+        })
       }
     }
   };
+  const onRemoveImage = (index: number) => setImages(prev => prev.filter((_i, i) => i !== index))
 
   return (
     <div
@@ -174,65 +187,9 @@ const ChatInner: FC<Props> = observer(({ isDrawer, topic, profile, topicId }) =>
             scrollableTarget="scrollableDiv"
           >
             <Typing userTyping={userTyping} />
-            {listMessage.map((message, index) => {
-              const type = message.user?.id === profile.id ? 'out' : 'in';
-              const state = type === 'in' ? 'info' : 'primary'
-              const templateAttr = {}
-              const contentClass = `${isDrawer ? '' : 'd-flex'} justify-content-${type === 'in' ? 'start' : 'end'
-                } mb-10`
-              return (
-                <div
-                  key={`message${index}`}
-                  className={clsx('d-flex', contentClass, 'mb-10')}
-                  {...templateAttr}
-                >
-                  <div
-                    className={clsx(
-                      'd-flex flex-column align-items',
-                      `align-items-${type === 'in' ? 'start' : 'end'}`
-                    )}
-                  >
-                    <div className='d-flex align-items-center mb-2'>
-                      {type === 'in' ? (
-                        <>
-                          <div className='symbol  symbol-35px symbol-circle '>
-                            <Avatar imageUrl={message.user?.media?.original_url} size={35} type="circle" />
-                          </div>
-                          <div className='ms-3'>
-                            <div
-                              className='fs-5 fw-bolder text-gray-900 text-hover-primary me-1'
-                            >
-                              {message.user?.fullname}
-                            </div>
-                            <span className='text-muted fs-7 mb-1'>{formatDate(message.createdAt)}</span>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div className='me-3'>
-                            <span className='text-muted fs-7 mb-1'>{formatDate(message.createdAt)}</span>
-                          </div>
-                          <div className='symbol  symbol-35px symbol-circle '>
-                            <Avatar imageUrl={profile?.media?.original_url} size={35} type="circle" />
-                          </div>
-                        </>
-                      )}
-                    </div>
-
-                    <div
-                      className={clsx(
-                        'p-5 rounded',
-                        `bg-light-${state}`,
-                        'text-dark fw-bold mw-lg-400px',
-                        `text-${type === 'in' ? 'start' : 'end'}`
-                      )}
-                      data-kt-element='message-text'
-                      dangerouslySetInnerHTML={{ __html: message.msg }}
-                    ></div>
-                  </div>
-                </div>
-              )
-            })}
+            {listMessage.map((message, index) => (
+              <MessageItem key={index} message={message} profile={profile} isDrawer={isDrawer} />
+            ))}
           </InfiniteScroll>
         </div>
       </div>
@@ -252,7 +209,20 @@ const ChatInner: FC<Props> = observer(({ isDrawer, topic, profile, topicId }) =>
           onFocus={() => doTyping({ is_typing: true, topic_id: topic.id })}
           onBlur={() => doTyping({ is_typing: false, topic_id: topic.id })}
         />
-
+        <div className="overflow-scroll">
+          <div className="d-flex with-max-content">
+            {
+              images.map((image, index) => (
+                <div key={index} style={{ width: 100, aspectRatio: '1 / 1' }} className="position-relative me-4">
+                  <img className="position-absolute top-0 start-0 w-100 h-100 rounded-2 object-fit-cover" src={image.original_url} alt="" />
+                  <div onClick={() => onRemoveImage(index)} className="position-absolute bg-secondary rounded-circle end-0 btn p-0" style={{ zIndex: 10 }}>
+                    <img src={toAbsoluteUrl("/media/icons/duotune/general/gen040.svg")} alt="" />
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
         <div className='d-flex flex-stack'>
           <div className='d-flex align-items-center me-2'>
             <button
@@ -285,6 +255,83 @@ const ChatInner: FC<Props> = observer(({ isDrawer, topic, profile, topicId }) =>
     </div>
   )
 })
+
+const MessageItem: FC<{ message: IMessage, profile: IUserProfile, isDrawer?: boolean }> = ({ message, profile, isDrawer }) => {
+  const type = message.user?.id === profile.id ? 'out' : 'in';
+  const state = type === 'in' ? 'info' : 'primary'
+  const templateAttr = {}
+  const contentClass = `${isDrawer ? '' : 'd-flex'} justify-content-${type === 'in' ? 'start' : 'end'
+    } mb-10`
+  return (
+    <div
+      className={clsx('d-flex', contentClass, 'mb-10')}
+      {...templateAttr}
+    >
+      <div
+        className={clsx(
+          'd-flex flex-column align-items',
+          `align-items-${type === 'in' ? 'start' : 'end'}`
+        )}
+      >
+        <div className='d-flex align-items-center mb-2'>
+          {type === 'in' ? (
+            <>
+              <div className='symbol  symbol-35px symbol-circle '>
+                <Avatar imageUrl={message.user?.media?.original_url} size={35} type="circle" />
+              </div>
+              <div className='ms-3'>
+                <div
+                  className='fs-5 fw-bolder text-gray-900 text-hover-primary me-1'
+                >
+                  {message.user?.fullname}
+                </div>
+                <span className='text-muted fs-7 mb-1'>{formatDate(message.createdAt)}</span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className='me-3'>
+                <span className='text-muted fs-7 mb-1'>{formatDate(message.createdAt)}</span>
+              </div>
+              <div className='symbol  symbol-35px symbol-circle '>
+                <Avatar imageUrl={profile?.media?.original_url} size={35} type="circle" />
+              </div>
+            </>
+          )}
+        </div>
+        <div
+          className={clsx(
+            'p-5 rounded',
+            `bg-light-${state}`,
+            'text-dark fw-bold mw-lg-600px',
+            `text-${type === 'in' ? 'start' : 'end'}`
+          )}
+        >
+          <div
+            data-kt-element="message-text"
+            dangerouslySetInnerHTML={{ __html: message.msg }}
+          />
+          <div className="d-flex flex-wrap justify-content-end">
+            {message.medias.map((media) => (
+              <div
+                key={media.id}
+                className="position-relative m-2"
+                style={{ width: 150, aspectRatio: '1 / 1' }}
+              >
+                <img
+                  className="position-absolute top-0 start-0 w-100 h-100 rounded-2 object-fit-cover"
+                  src={media.original_url}
+                  alt=""
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  )
+}
 
 const Typing: FC<{ userTyping?: IUserProfile }> = ({ userTyping }) => {
   if (!userTyping) return null;

@@ -11,11 +11,14 @@ export const aesEncode = (text: string) => {
   return encryptedHex;
 };
 export const aesDecode = (code: string) => {
-  const key = EnvConfig.APP_AES_JS_KEY.split(',')?.map((i) => parseInt(i));
-  const encryptedBytes = aesjs.utils.hex.toBytes(code);
-  const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
-  const decryptedBytes = aesCtr.decrypt(encryptedBytes);
-  const decryptedText = aesjs.utils.utf8.fromBytes(decryptedBytes);
+  let decryptedText = '';
+  try {
+    const key = EnvConfig.APP_AES_JS_KEY.split(',')?.map((i) => parseInt(i));
+    const encryptedBytes = aesjs.utils.hex.toBytes(code);
+    const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+    const decryptedBytes = aesCtr.decrypt(encryptedBytes);
+    decryptedText = aesjs.utils.utf8.fromBytes(decryptedBytes);
+  } catch (error) { }
   return decryptedText;
 };
 

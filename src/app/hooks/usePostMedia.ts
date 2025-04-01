@@ -2,7 +2,9 @@ import { useStores } from "../models/store";
 
 interface Media {
   id?: number;
-  origin_url?: string
+  origin_url?: string;
+  original_url?: string;
+  file?:File;
 }
 
 interface Options {
@@ -17,9 +19,12 @@ export function usePostMedia() {
     if (options.files.length === 0) return;
     let medias: Media[] = []
     for (var i = 0; i < options.files.length; i++) {
+      const link = URL.createObjectURL(options.files[i]);
       const item: Media = {
         id: undefined,
-        origin_url: URL.createObjectURL(options.files[i])
+        origin_url: link,
+        original_url: link,
+        file:options.files[i]
       }
       medias.push(item)
     }
@@ -32,7 +37,8 @@ export function usePostMedia() {
         const response = await mediaModel.postMedia(formData);
         const item: Media = {
           id: response.id,
-          origin_url: response.original_url
+          origin_url: response.original_url,
+          original_url: response.original_url
         }
         medias.push(item);
         options.callBackApi(medias);

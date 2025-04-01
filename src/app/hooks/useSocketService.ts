@@ -5,25 +5,22 @@ import { authHandler, baseURL } from "../configs";
 import { Const, WS_EVENT_NAME } from "../common";
 import { IMessage, IResponse, ITopic } from "../interfaces";
 
-export function useSocketService(isInstance=true) {
+export function useSocketService(isInstance = true) {
   const socketRef = useRef<Socket | null>(null);
 
   const connect = async () => {
     if (socketRef.current) return socketRef.current;
-
     const token = await authHandler();
-
     return new Promise<Socket>((resolve, reject) => {
       try {
         socketRef.current = io(baseURL, {
           extraHeaders: {
             Authorization: token,
           },
-          reconnection:true,
-          reconnectionAttempts:100,
-          reconnectionDelay:2000
+          reconnection: true,
+          reconnectionAttempts: 100,
+          reconnectionDelay: 2000
         });
-
         socketRef.current.on("connect", () => {
           console.log("Connected to WebSocket");
           resolve(socketRef.current!);
@@ -47,17 +44,20 @@ export function useSocketService(isInstance=true) {
     }
   };
 
-  const onListenerTopicCreated = (cb: (data: IResponse<{topicResponse:ITopic, messageResponse:IMessage}>) => void) => {
+  const onListenerTopicCreated = (cb: (data: IResponse<{ topicResponse: ITopic, messageResponse: IMessage }>) => void) => {
     socketRef.current?.on(WS_EVENT_NAME.receive_topic, cb)
   }
-  const onListenerMessage = (cb: (data: any) => void) => {
+  const onListenerMessageGlobal = (cb: (data: IResponse<IMessage>) => void) => {
+    socketRef.current?.on('message_global', cb);
+  };
+  const onListenerMessage = (cb: (data: IResponse<IMessage>) => void) => {
     socketRef.current?.on(WS_EVENT_NAME.message, cb);
   };
   const onListenerTyping = (cb: (data: any) => void) => {
     socketRef.current?.on(WS_EVENT_NAME.typing, cb)
   }
   //[DO ACTION]
-  const doCreateTopic = (body: {topic_id:number, recipient_id: number; group_name: string; msg?: string; media_id?: number; }) => {
+  const doCreateTopic = (body: { topic_id: number, recipient_id: number; group_name: string; msg?: string; media_id?: number; }) => {
     if (!socketRef.current) return;
     socketRef.current.emit(WS_EVENT_NAME.create_topic, body)
   }
@@ -69,9 +69,9 @@ export function useSocketService(isInstance=true) {
     socketRef.current.emit(WS_EVENT_NAME.join, { topic_id });
   };
 
-  const doMessage = (data: { msg: string; topic_id: number }) => {
+  const doMessage = (data: { msg: string; topic_id: number, media_ids: number[] }) => {
     if (!socketRef.current) return;
-    socketRef.current.emit(WS_EVENT_NAME.message, { msg: data.msg, topic_id: data.topic_id });
+    socketRef.current.emit(WS_EVENT_NAME.message, { msg: data.msg, topic_id: data.topic_id, media_ids: data.media_ids });
   };
 
   const doTyping = (data: { is_typing: boolean, topic_id: number }) => {
@@ -80,7 +80,7 @@ export function useSocketService(isInstance=true) {
   }
 
   useEffect(() => {
-    if(isInstance){
+    if (isInstance) {
       connect();
     }
     // return () => {
@@ -92,6 +92,7 @@ export function useSocketService(isInstance=true) {
     connect,
     disconnect,
     onListenerTopicCreated,
+    onListenerMessageGlobal,
     onListenerMessage,
     onListenerTyping,
 

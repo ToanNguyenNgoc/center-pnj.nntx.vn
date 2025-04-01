@@ -16,3 +16,12 @@
 :root {
   --box-shadow: 0px 0px 16px -1px rgba(0, 0, 0, 0.1);
 }
+.cursor-pointers{
+  cursor: pointer;
+}
+.object-fit-cover{
+  object-fit: cover;
+}
+.with-max-content{
+  width: max-content;
+}

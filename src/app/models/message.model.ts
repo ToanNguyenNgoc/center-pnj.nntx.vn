@@ -3,14 +3,21 @@ import { IMessage, IResponse, IResponsePagination, QrMessage } from "../interfac
 import { AxiosConfig } from "../configs";
 
 export const MessageModel = types
-  .model('MessageModel')
+  .model('MessageModel', {
+    messageJon: types.maybeNull(types.string),
+  })
   .actions(self => {
     const getMessages = flow(function* getMessages(params: QrMessage) {
       const response: IResponse<IResponsePagination<IMessage[]>> = yield AxiosConfig().get('/messages', { params });
       return response.context;
     })
+    //listener message global
+    const setMessageJson = (dataJson: string) => self.messageJon = dataJson
+    const deleteMessageJson = () => self.messageJon = null
     return {
-      getMessages
+      getMessages,
+      setMessageJson,
+      deleteMessageJson
     }
   })
 

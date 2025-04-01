@@ -8,3 +8,4 @@ export * from './useDebounce';
 export * from './useGetProvince';
 export * from './useGetOrgContactTypes';
 export * from './useSocketService';
+export * from './useGetTopicMessageGlobal';

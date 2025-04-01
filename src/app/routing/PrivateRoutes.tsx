@@ -7,7 +7,7 @@ import { MenuTestPage } from '../pages/MenuTestPage'
 import { getCSSVariableValue } from '../../_metronic/assets/ts/_utils'
 import { WithChildren } from '../../_metronic/helpers'
 import BuilderPageWrapper from '../pages/layout-builder/BuilderPageWrapper'
-import { InstanceSocket } from '../components'
+import { InstanceSocket, NotificationMessage } from '../components'
 
 const PrivateRoutes = () => {
   const ProfilePage = lazy(() => import('../modules/profile/ProfilePage'))
@@ -28,6 +28,7 @@ const PrivateRoutes = () => {
   return (
     <Fragment>
       <InstanceSocket />
+      <NotificationMessage/>
       <Routes>
         <Route element={<MasterLayout />}>
           {/* Redirect to Dashboard after success login/registartion */}
@@ -168,7 +169,7 @@ const PrivateRoutes = () => {
             }
           />
           <Route
-            path='apps/messengers'
+            path='apps/messengers/*'
             element={
               <SuspensedView>
                 <MessengerPage />

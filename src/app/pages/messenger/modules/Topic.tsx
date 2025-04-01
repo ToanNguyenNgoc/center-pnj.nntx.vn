@@ -1,13 +1,14 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { observer } from "mobx-react-lite";
-import { FC, memo } from "react";
+import { FC, useEffect } from "react";
 import { KTSVG } from "../../../../_metronic/helpers";
 import { useQuery } from "react-query";
 import { Const } from "../../../common";
 import { useStores } from "../../../models/store";
-import { useAuth, useQueryParams } from "../../../hooks";
+import { useAuth, useGetTopicMessageGlobal, useQueryParams } from "../../../hooks";
 import { ITopic, QrTopic } from "../../../interfaces";
-import { Link, useNavigate } from "react-router-dom";
-import { aesEncode } from "../../../utils";
+import { useNavigate, useParams } from "react-router-dom";
+import { aesDecode, aesEncode, formatDateFromNow } from "../../../utils";
 
 export const GetTopicName = (topic: ITopic, profileId: number) => {
   let name = topic.group_name;
@@ -18,21 +19,26 @@ export const GetTopicName = (topic: ITopic, profileId: number) => {
   return name;
 }
 
-export const Topic: FC = memo(() => {
-  const { profile } = useAuth()
+export const Topic: FC = observer(() => {
+  const { profile } = useAuth();
+  const params = useParams();
+  const { messageGlobal } = useGetTopicMessageGlobal()
   const navigate = useNavigate();
   const { topicModel } = useStores();
   const { query } = useQueryParams<QrTopic>()
-  const { data } = useQuery({
+  const { data, refetch } = useQuery({
     queryKey: [Const.QueryKey.topics],
     queryFn: () => topicModel.getTopics(query),
     onSuccess(data) {
-      if (data.data.length > 0) {
-        navigate(`/apps/messengers?topic_id=${aesEncode(String(data.data[0].id))}`)
+      if ((data.data.length > 0 && !params.id) || Number(aesDecode(String(params.id))) === 0) {
+        navigate(`/apps/messengers/${aesEncode(String(data?.data[0]?.id))}`)
       }
     },
   })
   const topics = data?.data || []
+  useEffect(() => {
+    refetch()
+  }, [messageGlobal?.id])
   return (
     <div className='flex-column flex-lg-row-auto w-100 w-lg-300px w-xl-400px mb-10 mb-lg-0'>
       <div className='card card-flush'>
@@ -64,7 +70,11 @@ export const Topic: FC = memo(() => {
           >
             {
               topics.map(topic => (
-                <div onClick={() => navigate(`/apps/messengers?topic_id=${aesEncode(String(topic.id))}`)} key={topic.id} className="pe-auto">
+                <div
+                  // onClick={() => navigate(`/apps/messengers?topic_id=${aesEncode(String(topic.id))}`)}
+                  onClick={() => navigate(`/apps/messengers/${aesEncode(String(topic.id))}`)}
+                  key={topic.id} className="cursor-pointers"
+                >
                   <div className='d-flex flex-stack py-4'>
                     <div className='d-flex align-items-center'>
                       <div className='symbol symbol-45px symbol-circle'>
@@ -80,7 +90,9 @@ export const Topic: FC = memo(() => {
                       </div>
                     </div>
                     <div className='d-flex flex-column align-items-end ms-2'>
-                      <span className='text-muted fs-7 mb-1'>5 hrs</span>
+                      <span className='text-muted fs-7 mb-1'>
+                        {formatDateFromNow(topic.updatedAt)}
+                      </span>
                     </div>
                   </div>
                   <div className='separator separator-dashed d-none'></div>

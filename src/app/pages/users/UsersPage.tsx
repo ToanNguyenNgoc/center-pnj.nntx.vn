@@ -124,7 +124,7 @@ const UserItem: FC<UserItemProps> = ({ user, onDelete = () => null }) => {
   const onNavigateMessenger = async () => {
     const topic = await topicModel.postTopic({ recipient_id: user.id, group_name: '' })
     if (topic.id) {
-      navigate(`/apps/messengers?topic_id=${aesEncode(String(topic.id))}`)
+      navigate(`/apps/messengers/${aesEncode(String(topic.id))}`)
     }
   }
   return (
