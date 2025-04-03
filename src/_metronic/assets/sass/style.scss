@@ -16,12 +16,25 @@
 :root {
   --box-shadow: 0px 0px 16px -1px rgba(0, 0, 0, 0.1);
 }
-.cursor-pointers{
+
+.cursor-pointers {
   cursor: pointer;
 }
-.object-fit-cover{
+
+.object-fit-cover {
   object-fit: cover;
 }
-.with-max-content{
+
+.with-max-content {
   width: max-content;
+}
+
+.text-row-1 {
+  -webkit-line-clamp: 1;
+  color: var(--text-hover);
+  -webkit-box-orient: vertical;
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
 }

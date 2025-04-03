@@ -14,10 +14,15 @@ export const MessageModel = types
     //listener message global
     const setMessageJson = (dataJson: string) => self.messageJon = dataJson
     const deleteMessageJson = () => self.messageJon = null
+    const deleteMessage = flow(function* deleteMessage(id: number) {
+      const response: IResponse<any> = yield AxiosConfig().delete(`/messages/${id}`);
+      return response
+    })
     return {
       getMessages,
       setMessageJson,
-      deleteMessageJson
+      deleteMessageJson,
+      deleteMessage
     }
   })
 

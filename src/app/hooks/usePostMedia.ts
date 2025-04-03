@@ -5,6 +5,7 @@ interface Media {
   origin_url?: string;
   original_url?: string;
   file?:File;
+  mime_type?:string
 }
 
 interface Options {
@@ -19,12 +20,13 @@ export function usePostMedia() {
     if (options.files.length === 0) return;
     let medias: Media[] = []
     for (var i = 0; i < options.files.length; i++) {
-      const link = URL.createObjectURL(options.files[i]);
+      const link = URL.createObjectURL(options.files[i])
       const item: Media = {
         id: undefined,
         origin_url: link,
         original_url: link,
-        file:options.files[i]
+        file:options.files[i],
+        mime_type:options.files[i].type
       }
       medias.push(item)
     }

@@ -12,3 +12,5 @@ export * from './react-switch/Switch';
 export * from './confirm-action/ConfirmAction';
 export * from './select-option-province/SelectOptionProvince';
 export * from './instance-socket/InstanceSocket';
+export * from './render-media/RenderMedia';
+export * from './drop-menu/DropMenu';

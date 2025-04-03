@@ -11,7 +11,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { aesDecode, aesEncode, formatDateFromNow } from "../../../utils";
 
 export const GetTopicName = (topic: ITopic, profileId: number) => {
-  let name = topic.group_name;
+  let name = topic.group_name || topic.users.map(i => i.fullname).filter(Boolean).join(', ');
   const users = topic.users.filter(i => i.id !== profileId)
   if (topic.type === 'DUOS' && users.length > 0) {
     name = users[0].fullname
@@ -79,18 +79,18 @@ export const Topic: FC = observer(() => {
                     <div className='d-flex align-items-center'>
                       <div className='symbol symbol-45px symbol-circle'>
                         <span className='symbol-label bg-light-danger text-danger fs-6 fw-bolder'>
-                          {GetTopicName(topic, Number(profile?.id)).slice(0, 1)}
+                          {GetTopicName(topic, Number(profile?.id))?.slice(0, 1)}
                         </span>
                       </div>
                       <div className='ms-5'>
-                        <div className='fs-5 fw-bolder text-gray-900 text-hover-primary mb-2'>
+                        <div className='fs-5 fw-bolder text-gray-900 text-hover-primary mb-2 text-row-1'>
                           {GetTopicName(topic, Number(profile?.id))}
                         </div>
-                        <div className='fw-bold text-gray-400'>{topic.msg}</div>
+                        <div className='fw-bold text-gray-400 text-row-1'>{topic.msg}</div>
                       </div>
                     </div>
                     <div className='d-flex flex-column align-items-end ms-2'>
-                      <span className='text-muted fs-7 mb-1'>
+                      <span className='text-muted fs-8 mb-1'>
                         {formatDateFromNow(topic.updatedAt)}
                       </span>
                     </div>

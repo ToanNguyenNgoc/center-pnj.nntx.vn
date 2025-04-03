@@ -44,6 +44,11 @@ export function useGenPermissionGroup() {
       desc: 'Banner',
       permissions: permissions.filter(i => i.name.includes('.banners.'))
     },
+    {
+      name: 'topics',
+      desc: 'Chat',
+      permissions: permissions.filter(i => i.name.includes('.topics.'))
+    },
   ]
   return {
     permissionsGroup

@@ -57,10 +57,6 @@ export function useSocketService(isInstance = true) {
     socketRef.current?.on(WS_EVENT_NAME.typing, cb)
   }
   //[DO ACTION]
-  const doCreateTopic = (body: { topic_id: number, recipient_id: number; group_name: string; msg?: string; media_id?: number; }) => {
-    if (!socketRef.current) return;
-    socketRef.current.emit(WS_EVENT_NAME.create_topic, body)
-  }
   const doJoinAllTopic = () => {
     socketRef.current?.emit(Const.EventName.join_all);
   }
@@ -96,7 +92,6 @@ export function useSocketService(isInstance = true) {
     onListenerMessage,
     onListenerTyping,
 
-    doCreateTopic,
     doJoinAllTopic,
     doJoinTopic,
     doMessage,

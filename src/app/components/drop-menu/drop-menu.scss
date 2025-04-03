@@ -1,0 +1,20 @@
+.menu-container {
+  border-radius: 0.475rem;
+  background-color: var(--kt-menu-dropdown-bg-color);
+  box-shadow: var(--kt-menu-dropdown-box-shadow);
+  position: absolute;
+  z-index: 1000;
+  width: max-content;
+  transform: translateX(-55%);
+  left: 0;
+  margin-top: 16px;
+  visibility: hidden;
+  opacity: 0;
+  transition: all .3s;
+}
+.menu-container-act{
+  margin-top: 0px;
+  visibility: visible;
+  opacity: 1;
+  transition: all .3s;
+}
